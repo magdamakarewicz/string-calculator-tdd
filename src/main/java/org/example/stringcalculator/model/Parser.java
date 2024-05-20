@@ -13,8 +13,16 @@ public class Parser {
     }
 
     public List<Integer> parse() {
+        checkLastCharacter();
         processNumbers(input.split(",|\n"));
         return resultNumbers;
+    }
+
+    private void checkLastCharacter() {
+        char lastChar = input.charAt(input.length() - 1);
+        if (lastChar == ',' || lastChar == '\n') {
+            throw new IllegalArgumentException("Separator at the end is not allowed.");
+        }
     }
 
     private void processNumbers(String[] tokens) {
@@ -27,4 +35,3 @@ public class Parser {
     }
 
 }
-

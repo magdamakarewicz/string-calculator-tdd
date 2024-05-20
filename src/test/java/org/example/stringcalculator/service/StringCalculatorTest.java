@@ -1,8 +1,10 @@
 package org.example.stringcalculator.service;
 
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StringCalculatorTest {
 
@@ -69,6 +71,36 @@ class StringCalculatorTest {
 
         //then
         assertEquals(expectedResult, result);
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenComaAtTheEndOfInput() {
+        //given
+        String inputForTest = "1,2,";
+
+        //when
+        Exception e = assertThrows(IllegalArgumentException.class, () -> StringCalculator.add(inputForTest));
+
+        //then
+        SoftAssertions sa = new SoftAssertions();
+        sa.assertThat(e).isExactlyInstanceOf(IllegalArgumentException.class);
+        sa.assertThat(e).hasMessage("Separator at the end is not allowed.");
+        sa.assertAll();
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenNewlineAtTheEndOfInput() {
+        //given
+        String inputForTest = "1,2\n";
+
+        //when
+        Exception e = assertThrows(IllegalArgumentException.class, () -> StringCalculator.add(inputForTest));
+
+        //then
+        SoftAssertions sa = new SoftAssertions();
+        sa.assertThat(e).isExactlyInstanceOf(IllegalArgumentException.class);
+        sa.assertThat(e).hasMessage("Separator at the end is not allowed.");
+        sa.assertAll();
     }
 
 }
