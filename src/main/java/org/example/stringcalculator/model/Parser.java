@@ -18,9 +18,6 @@ public class Parser {
     }
 
     private void processNumbers(String[] tokens) {
-        if (tokens.length > 2) {
-            throw new IllegalArgumentException("Invalid input. Calculator can take up to two numbers");
-        }
         for (String token : tokens) {
             if (!token.isEmpty()) {
                 int number = Integer.parseInt(token.trim());

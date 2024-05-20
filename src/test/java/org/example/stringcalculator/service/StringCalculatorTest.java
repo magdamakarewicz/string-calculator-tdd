@@ -1,9 +1,8 @@
 package org.example.stringcalculator.service;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringCalculatorTest {
 
@@ -47,18 +46,16 @@ class StringCalculatorTest {
     }
 
     @Test
-    void shouldThrowIllegalArgumentExceptionWhenMoreThanTwoNumbers() {
+    void shouldReturn10WhenAddMultipleNumbersFrom1To4SeparatedByComa() {
         //given
-        String inputForTest = "1,2,3";
+        String inputForTest = "1,2,3,4";
+        int expectedResult = 10;
 
         //when
-        Exception e = assertThrows(IllegalArgumentException.class, () -> StringCalculator.add(inputForTest));
+        int result = StringCalculator.add(inputForTest);
 
         //then
-        SoftAssertions sa = new SoftAssertions();
-        sa.assertThat(e).isExactlyInstanceOf(IllegalArgumentException.class);
-        sa.assertThat(e).hasMessage("Invalid input. Calculator can take up to two numbers");
-        sa.assertAll();
+        assertEquals(expectedResult, result);
     }
 
 }
