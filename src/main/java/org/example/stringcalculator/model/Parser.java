@@ -13,7 +13,7 @@ public class Parser {
     }
 
     public List<Integer> parse() {
-        processNumbers(input.split(","));
+        processNumbers(input.split(",|\n"));
         return resultNumbers;
     }
 
