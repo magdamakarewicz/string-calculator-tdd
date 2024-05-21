@@ -8,6 +8,7 @@ public class Parser {
 
     private final String input;
     private String delimiter = "[,\n]";
+    private final List<Integer> negatives = new ArrayList<>();
     private final List<Integer> resultNumbers = new ArrayList<>();
 
     public Parser(String input) {
@@ -40,9 +41,11 @@ public class Parser {
     private void processNumbers(String[] tokens) {
         for (String token : tokens) {
             if (!token.isEmpty()) {
-                int number = Integer.parseInt(token.trim());
-                resultNumbers.add(number);
+                processSingleNumber(token.trim());
             }
+        }
+        if (!negatives.isEmpty()) {
+            handleNegativeNumbers();
         }
     }
 
@@ -60,26 +63,48 @@ public class Parser {
                 if (nonNumericChar != 0) {
                     processTokenWithIncorrectDelimiter(nonNumericChar);
                 } else {
-                    int number = Integer.parseInt(token.trim());
-                    resultNumbers.add(number);
+                    processSingleNumber(token.trim());
                 }
             }
+        }
+        if (!negatives.isEmpty()) {
+            handleNegativeNumbers();
         }
     }
 
     private char findNonNumericChar(String str) {
         for (char c : str.toCharArray()) {
-            if (!Character.isDigit(c)) {
+            if (!Character.isDigit(c) && c != '-') {
                 return c;
             }
         }
         return 0;
     }
 
+    private void processSingleNumber(String token) {
+        int number = Integer.parseInt(token);
+        if (number < 0) {
+            negatives.add(number);
+        } else {
+            resultNumbers.add(number);
+        }
+    }
+
     private void processTokenWithIncorrectDelimiter(char nonNumericChar) {
         int position = input.indexOf(nonNumericChar) - input.indexOf("\n") - 1;
         throw new IllegalArgumentException("'" + delimiter + "' expected but '" + nonNumericChar +
                 "' found at position " + position + ".");
+    }
+
+    private void handleNegativeNumbers() {
+        StringBuilder message = new StringBuilder("Negative number(s) not allowed: ");
+        for (int i = 0; i < negatives.size(); i++) {
+            if (i > 0) {
+                message.append(", ");
+            }
+            message.append(negatives.get(i));
+        }
+        throw new IllegalArgumentException(message.toString());
     }
 
 }
