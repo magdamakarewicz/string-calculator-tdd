@@ -10,6 +10,7 @@ public class Parser {
     private String delimiter = "[,\n]";
     private final List<Integer> negatives = new ArrayList<>();
     private final List<Integer> resultNumbers = new ArrayList<>();
+    private final List<String> errors = new ArrayList<>();
 
     public Parser(String input) {
         this.input = input;
@@ -24,6 +25,7 @@ public class Parser {
             parseDefault();
         }
 
+        handleErrors(errors);
         return resultNumbers;
     }
 
@@ -61,7 +63,7 @@ public class Parser {
             if (!token.isEmpty()) {
                 char nonNumericChar = findNonNumericChar(token);
                 if (nonNumericChar != 0) {
-                    processTokenWithIncorrectDelimiter(nonNumericChar);
+                    processTokenWithIncorrectDelimiter(token, nonNumericChar);
                 } else {
                     processSingleNumber(token.trim());
                 }
@@ -90,9 +92,13 @@ public class Parser {
         }
     }
 
-    private void processTokenWithIncorrectDelimiter(char nonNumericChar) {
+    private void processTokenWithIncorrectDelimiter(String token, char nonNumericChar) {
+        String[] numbersWithIncorrectDelimiter = token.split(String.valueOf(nonNumericChar));
+        for (String num : numbersWithIncorrectDelimiter) {
+            processSingleNumber(num);
+        }
         int position = input.indexOf(nonNumericChar) - input.indexOf("\n") - 1;
-        throw new IllegalArgumentException("'" + delimiter + "' expected but '" + nonNumericChar +
+        errors.add("'" + delimiter + "' expected but '" + nonNumericChar +
                 "' found at position " + position + ".");
     }
 
@@ -104,7 +110,13 @@ public class Parser {
             }
             message.append(negatives.get(i));
         }
-        throw new IllegalArgumentException(message.toString());
+        errors.add(0, message.toString());
+    }
+
+    private void handleErrors(List<String> errors) {
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException(String.join("\n", errors));
+        }
     }
 
 }

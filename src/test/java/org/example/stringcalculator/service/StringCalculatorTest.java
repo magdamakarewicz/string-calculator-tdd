@@ -202,4 +202,20 @@ class StringCalculatorTest {
         sa.assertAll();
     }
 
+    @Test
+    void shouldThrowIllegalArgumentExceptionWithAllErrorMessagesSeparatedByNewlinesWhenMultipleErrorsOccurs() {
+        //given
+        String inputForTest = "//|\n1|2,-3";
+
+        //when
+        Exception e = assertThrows(IllegalArgumentException.class, () -> StringCalculator.add(inputForTest));
+
+        //then
+        SoftAssertions sa = new SoftAssertions();
+        sa.assertThat(e).isExactlyInstanceOf(IllegalArgumentException.class);
+        sa.assertThat(e).hasMessage("Negative number(s) not allowed: -3\n" +
+                "'|' expected but ',' found at position 3.");
+        sa.assertAll();
+    }
+
 }
