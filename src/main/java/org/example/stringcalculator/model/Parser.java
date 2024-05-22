@@ -17,19 +17,17 @@ public class Parser {
     }
 
     public List<Integer> parse() {
-        checkLastCharacter();
-
+        validateLastCharacter();
         if (input.startsWith("//")) {
             parseWithCustomDelimiter();
         } else {
             parseDefault();
         }
-
-        handleErrors(errors);
+        checkErrors(errors);
         return resultNumbers;
     }
 
-    private void checkLastCharacter() {
+    private void validateLastCharacter() {
         char lastChar = input.charAt(input.length() - 1);
         if (lastChar == ',' || lastChar == '\n') {
             throw new IllegalArgumentException("Separator at the end is not allowed.");
@@ -38,6 +36,13 @@ public class Parser {
 
     private void parseDefault() {
         processNumbers(input.split(delimiter));
+    }
+
+    private void parseWithCustomDelimiter() {
+        int delimiterIndex = input.indexOf("\n");
+        delimiter = input.substring(2, delimiterIndex);
+        String[] tokens = input.substring(delimiterIndex + 1).split(Pattern.quote(delimiter));
+        processNumbersWithCustomDelimiter(tokens);
     }
 
     private void processNumbers(String[] tokens) {
@@ -51,19 +56,12 @@ public class Parser {
         }
     }
 
-    private void parseWithCustomDelimiter() {
-        int delimiterIndex = input.indexOf("\n");
-        delimiter = input.substring(2, delimiterIndex);
-        String[] tokens = input.substring(delimiterIndex + 1).split(Pattern.quote(delimiter));
-        processNumbersWithCustomDelimiter(tokens);
-    }
-
     private void processNumbersWithCustomDelimiter(String[] tokens) {
         for (String token : tokens) {
             if (!token.isEmpty()) {
                 char nonNumericChar = findNonNumericChar(token);
                 if (nonNumericChar != 0) {
-                    processTokenWithIncorrectDelimiter(token, nonNumericChar);
+                    processIncorrectDelimiter(token, nonNumericChar);
                 } else {
                     processSingleNumber(token.trim());
                 }
@@ -87,14 +85,14 @@ public class Parser {
         int number = Integer.parseInt(token);
         if (number < 0) {
             negatives.add(number);
-        } else {
+        } else if (number <= 1000) {
             resultNumbers.add(number);
         }
     }
 
-    private void processTokenWithIncorrectDelimiter(String token, char nonNumericChar) {
-        String[] numbersWithIncorrectDelimiter = token.split(String.valueOf(nonNumericChar));
-        for (String num : numbersWithIncorrectDelimiter) {
+    private void processIncorrectDelimiter(String token, char nonNumericChar) {
+        String[] splitTokens = token.split(String.valueOf(nonNumericChar));
+        for (String num : splitTokens) {
             processSingleNumber(num);
         }
         int position = input.indexOf(nonNumericChar) - input.indexOf("\n") - 1;
@@ -113,7 +111,7 @@ public class Parser {
         errors.add(0, message.toString());
     }
 
-    private void handleErrors(List<String> errors) {
+    private void checkErrors(List<String> errors) {
         if (!errors.isEmpty()) {
             throw new IllegalArgumentException(String.join("\n", errors));
         }
